@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
         tvIP = findViewById(R.id.tvIP);
         tvPort = findViewById(R.id.tvPort);
         tvMessages = findViewById(R.id.tvMessages);
+
         try {
             SERVER_IP = getLocalIpAddress();
         } catch (UnknownHostException e) {
@@ -87,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
         private Context context;
 
         ClientHandler(Socket socket, Context context) {
+            //SharedPreferencesUtils.clearSharedPreferences(context);
             this.clientSocket = socket;
             this.context = context;
             try {
@@ -106,8 +108,8 @@ public class MainActivity extends AppCompatActivity {
                 while ((message = input.readLine()) != null) {
                     final String finalMessage = message;
                     if (!"HEARTBEAT".equals(finalMessage)) {
+                        runOnUiThread(() -> tvMessages.append("Client: " + finalMessage + "\n"));
                         processClientMessage(finalMessage);
-
                     }
                     sendMessageToAllClients(message);
                 }
@@ -121,8 +123,21 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+
         private void processClientMessage(String message) {
-            if (message.contains("SAVE_NEW_DOCUMENT")) {
+            if (message.equals("REQUEST_FILE_LIST")) {
+                List<String> titles = SharedPreferencesUtils.getAllTitles(context);
+                String fileList = "FILE_LIST " + String.join(",", titles);
+                sendMessage(fileList);
+            } else if (message.startsWith("REQUEST_FILE_CONTENT")) {
+                String title = message.substring("REQUEST_FILE_CONTENT ".length());
+                String[] dateAndText = SharedPreferencesUtils.getTextByTitle(context, title);
+                if (dateAndText != null && dateAndText[0] != null && dateAndText[1] != null) {
+                    String date = dateAndText[0];
+                    String text = dateAndText[1];
+                    sendMessage("FILE_CONTENT " + title + " " + date + " " + text);
+                }
+            } else if (message.contains("SAVE_NEW_DOCUMENT")) {
                 String[] parts = message.split(" ", 5);
                 if (parts.length == 5) {
                     String ip = parts[0];
@@ -139,11 +154,43 @@ public class MainActivity extends AppCompatActivity {
                     if (titles.contains(title)) {
                         sendMessage("The document already exists");
                     } else {
-                        SharedPreferencesUtils.saveText(context, title, date, text);
+                        SharedPreferencesUtils.saveText(context, title, dateTime, text);
                         sendMessage("Document successfully saved");
                     }
                 }
-            } else {
+            }  else if (message.contains("REMOVE_DOCUMENT")) {
+                String[] parts = message.split(" ", 3);
+                if (parts.length == 3) {
+                    String title = parts[2];
+                    List<String> titles = SharedPreferencesUtils.getAllTitles(context);
+                    if (titles.contains(title)) {
+                        SharedPreferencesUtils.removeTextByTitle(context, title);
+                        sendMessage("Document successfully deleted");
+                    } else {
+                        sendMessage("The document does not exist");
+                    }
+                }
+            }else if (message.contains("CHANGE_DOCUMENT_TITLE")) {
+                String[] parts = message.split(" TO ", 2);
+                if (parts.length == 2) {
+                    String[] titleParts = message.split("CHANGE_DOCUMENT_TITLE ")[1].split(" TO ", 2);
+                    String oldTitle = titleParts[0];
+                    String newTitle = parts[1];
+                    List<String> titles = SharedPreferencesUtils.getAllTitles(context);
+                    if (titles.contains(oldTitle)) {
+                        String[] dateAndText = SharedPreferencesUtils.getTextByTitle(context, oldTitle);
+                        String date = dateAndText[0];
+                        String text = dateAndText[1];
+                        SharedPreferencesUtils.removeTextByTitle(context, oldTitle);
+                        SharedPreferencesUtils.saveText(context, newTitle, date, text);
+                        sendMessage("Document title successfully changed");
+                    }
+                }
+            }
+            else if (message.contains("SAVE_DOCUMENT")) {
+
+            }
+            else {
                 runOnUiThread(() -> tvMessages.append("Client: " + message + "\n"));
             }
         }

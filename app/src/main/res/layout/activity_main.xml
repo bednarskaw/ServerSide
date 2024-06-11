@@ -5,35 +5,44 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
-    <RelativeLayout xmlns:android = "http://schemas.android.com/apk/res/android"
-        xmlns:tools = "http://schemas.android.com/tools"
-        android:layout_width = "match_parent"
-        android:layout_height = "match_parent"
-        android:layout_margin = "16dp"
-        tools:context = ".MainActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="16dp">
+
         <TextView
-            android:id = "@+id/tvIP"
-            android:layout_width = "wrap_content"
-            android:layout_height = "wrap_content"
-            android:textAppearance = "@style/Base.TextAppearance.AppCompat.Medium" />
+            android:id="@+id/tvIP"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
+
         <TextView
-            android:id = "@+id/tvPort"
-            android:layout_width = "wrap_content"
-            android:layout_height = "wrap_content"
-            android:layout_below = "@+id/tvIP"
-            android:textAppearance = "@style/Base.TextAppearance.AppCompat.Medium" />
+            android:id="@+id/tvPort"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvIP"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
+
         <TextView
-            android:id = "@+id/tvConnectionStatus"
-            android:layout_width = "match_parent"
-            android:layout_height = "wrap_content"
-            android:layout_below = "@+id/tvPort"
-            android:textAppearance = "@style/Base.TextAppearance.AppCompat.Medium" />
-        <TextView
-            android:id = "@+id/tvMessages"
-            android:layout_width = "match_parent"
-            android:layout_height = "wrap_content"
-            android:layout_below = "@+id/tvConnectionStatus"
-            android:inputType = "textMultiLine"
-            android:textAppearance = "@style/Base.TextAppearance.AppCompat.Medium" />
+            android:id="@+id/tvConnectionStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tvPort"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
+
+        <!-- Wrap tvMessages inside ScrollView -->
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/tvConnectionStatus">
+
+            <TextView
+                android:id="@+id/tvMessages"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textMultiLine"
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
+        </ScrollView>
     </RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
