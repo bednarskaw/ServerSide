@@ -18,11 +18,12 @@ public class SharedPreferencesUtils {
      * @param date The date the text was saved.
      * @param text The text to be saved or updated.
      */
-    public static void saveText(Context context, String title, String date, String text) {
+    public static void saveText(Context context, String title, String date, String text,  String lastEditedBy) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(title + "_date", date);
         editor.putString(title + "_text", text);
+        editor.putString(title + "_last_edited_by", lastEditedBy);
         editor.apply();
     }
 
@@ -45,31 +46,20 @@ public class SharedPreferencesUtils {
         return titles;
     }
 
-    /**
-     * Retrieve the text and date by its title.
-     *
-     * @param context The context of the caller.
-     * @param title The title of the text.
-     * @return A string array containing the date and text associated with the given title, or null if not found.
-     */
     public static String[] getTextByTitle(Context context, String title) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         String date = sharedPreferences.getString(title + "_date", null);
         String text = sharedPreferences.getString(title + "_text", null);
-        return new String[]{date, text};
+        String last_edited_by = sharedPreferences.getString(title + "_last_edited_by", null);
+        return new String[]{date, text, last_edited_by};
     }
 
-    /**
-     * Remove the text and date by its title.
-     *
-     * @param context The context of the caller.
-     * @param title The title of the text to be removed.
-     */
     public static void removeTextByTitle(Context context, String title) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.remove(title + "_date");
         editor.remove(title + "_text");
+        editor.remove(title + "_last_edited_by");
         editor.apply();
     }
     public static void clearSharedPreferences(Context context) {
